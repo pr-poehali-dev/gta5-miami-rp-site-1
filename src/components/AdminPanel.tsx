@@ -40,6 +40,7 @@ const API_URL = "https://functions.poehali.dev/8041e2d0-0a4d-4f86-a776-4ba0c1ad8
 const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: AdminPanelProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState<"jobs" | "applications" | "vk" | "gallery">("jobs");
   const [imageUrl, setImageUrl] = useState("");
   const [editableJobs, setEditableJobs] = useState<Job[]>(jobs);
   const [newJobTitle, setNewJobTitle] = useState("");
@@ -223,6 +224,49 @@ const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: A
               <Icon name="X" size={20} />
             </Button>
           </CardTitle>
+          
+          <div className="flex gap-2 mt-4 flex-wrap">
+            <Button
+              onClick={() => setActiveTab("jobs")}
+              className={activeTab === "jobs" 
+                ? "bg-[var(--neon-purple)] text-white" 
+                : "bg-[#1A1A2E] text-white/60 hover:text-white"
+              }
+            >
+              <Icon name="Briefcase" className="mr-2" size={18} />
+              Вакансии
+            </Button>
+            <Button
+              onClick={() => setActiveTab("applications")}
+              className={activeTab === "applications" 
+                ? "bg-[var(--neon-pink)] text-white" 
+                : "bg-[#1A1A2E] text-white/60 hover:text-white"
+              }
+            >
+              <Icon name="Users" className="mr-2" size={18} />
+              Заявки ({applications.length})
+            </Button>
+            <Button
+              onClick={() => setActiveTab("vk")}
+              className={activeTab === "vk" 
+                ? "bg-[var(--neon-cyan)] text-black" 
+                : "bg-[#1A1A2E] text-white/60 hover:text-white"
+              }
+            >
+              <Icon name="MessageCircle" className="mr-2" size={18} />
+              ВК Виджет
+            </Button>
+            <Button
+              onClick={() => setActiveTab("gallery")}
+              className={activeTab === "gallery" 
+                ? "bg-[var(--neon-cyan)] text-black" 
+                : "bg-[#1A1A2E] text-white/60 hover:text-white"
+              }
+            >
+              <Icon name="Image" className="mr-2" size={18} />
+              Галерея
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
