@@ -94,6 +94,15 @@ const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: A
     }
   };
 
+  const handleDeleteJob = (jobId: number) => {
+    const updated = editableJobs.filter(job => job.id !== jobId);
+    setEditableJobs(updated);
+    toast({
+      title: "Вакансия удалена",
+      description: "Вакансия успешно удалена из списка",
+    });
+  };
+
   const handleSaveJobs = () => {
     onUpdateJobs(editableJobs);
     toast({
@@ -175,15 +184,24 @@ const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: A
                         <p className="text-white font-bold text-lg">{job.title}</p>
                         <p className="text-white/60 text-sm mt-1">{job.requirements}</p>
                       </div>
-                      <Button
-                        onClick={() => handleToggleJobStatus(job.id)}
-                        className={job.status === "Открыта" 
-                          ? "bg-green-500 hover:bg-green-600" 
-                          : "bg-red-500 hover:bg-red-600"
-                        }
-                      >
-                        {job.status}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleToggleJobStatus(job.id)}
+                          className={job.status === "Открыта" 
+                            ? "bg-green-500 hover:bg-green-600" 
+                            : "bg-red-500 hover:bg-red-600"
+                          }
+                        >
+                          {job.status}
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteJob(job.id)}
+                          variant="outline"
+                          className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        >
+                          <Icon name="Trash2" size={18} />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
