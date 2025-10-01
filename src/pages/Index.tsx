@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import AdminPanel from "@/components/AdminPanel";
+import { useToast } from "@/hooks/use-toast";
 
 interface JobApplication {
   id: number;
@@ -15,6 +16,7 @@ interface JobApplication {
 }
 
 const Index = () => {
+  const { toast } = useToast();
   const [activeSection, setActiveSection] = useState("home");
   const [onlinePlayers] = useState(247);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -57,6 +59,10 @@ const Index = () => {
       setVkInput("");
       setAgeInput("");
       setShowApplicationForm(null);
+      toast({
+        title: "Заявка отправлена!",
+        description: `Ваша заявка на должность "${jobTitle}" успешно отправлена администрации.`,
+      });
     }
   };
 
