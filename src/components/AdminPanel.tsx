@@ -14,16 +14,28 @@ interface JobApplication {
   date: string;
 }
 
+interface Job {
+  id: number;
+  title: string;
+  requirements: string;
+  status: "Открыта" | "Закрыта";
+}
+
 interface AdminPanelProps {
   onAddImage: (url: string) => void;
   applications: JobApplication[];
+  jobs: Job[];
+  onUpdateJobs: (jobs: Job[]) => void;
   onClose: () => void;
 }
 
-const AdminPanel = ({ onAddImage, onClose }: AdminPanelProps) => {
+const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: AdminPanelProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [editableJobs, setEditableJobs] = useState<Job[]>(jobs);
+  const [newJobTitle, setNewJobTitle] = useState("");
+  const [newJobRequirements, setNewJobRequirements] = useState("");
   const { toast } = useToast();
 
   const ADMIN_PASSWORD = "miami2024";
@@ -53,6 +65,41 @@ const AdminPanel = ({ onAddImage, onClose }: AdminPanelProps) => {
         description: "Изображение добавлено в галерею",
       });
     }
+  };
+
+  const handleToggleJobStatus = (jobId: number) => {
+    const updated = editableJobs.map(job => 
+      job.id === jobId 
+        ? { ...job, status: job.status === "Открыта" ? "Закрыта" as const : "Открыта" as const }
+        : job
+    );
+    setEditableJobs(updated);
+  };
+
+  const handleAddJob = () => {
+    if (newJobTitle.trim() && newJobRequirements.trim()) {
+      const newJob: Job = {
+        id: Date.now(),
+        title: newJobTitle,
+        requirements: newJobRequirements,
+        status: "Открыта"
+      };
+      setEditableJobs([...editableJobs, newJob]);
+      setNewJobTitle("");
+      setNewJobRequirements("");
+      toast({
+        title: "Вакансия добавлена",
+        description: `Вакансия "${newJobTitle}" добавлена в список`,
+      });
+    }
+  };
+
+  const handleSaveJobs = () => {
+    onUpdateJobs(editableJobs);
+    toast({
+      title: "Сохранено",
+      description: "Вакансии успешно обновлены",
+    });
   };
 
   if (!isAuthenticated) {
@@ -116,6 +163,66 @@ const AdminPanel = ({ onAddImage, onClose }: AdminPanelProps) => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
+            <Label className="text-white text-xl text-[var(--neon-purple)]">
+              Управление вакансиями
+            </Label>
+            <div className="space-y-3">
+              {editableJobs.map((job) => (
+                <Card key={job.id} className="bg-[#1A1A2E] border-[var(--neon-purple)]/30">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                      <div className="flex-1">
+                        <p className="text-white font-bold text-lg">{job.title}</p>
+                        <p className="text-white/60 text-sm mt-1">{job.requirements}</p>
+                      </div>
+                      <Button
+                        onClick={() => handleToggleJobStatus(job.id)}
+                        className={job.status === "Открыта" 
+                          ? "bg-green-500 hover:bg-green-600" 
+                          : "bg-red-500 hover:bg-red-600"
+                        }
+                      >
+                        {job.status}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            <div className="space-y-3 mt-4 p-4 bg-[#1A1A2E] rounded-lg border border-[var(--neon-purple)]/30">
+              <Label className="text-white">Добавить новую вакансию</Label>
+              <Input
+                placeholder="Название должности"
+                value={newJobTitle}
+                onChange={(e) => setNewJobTitle(e.target.value)}
+                className="bg-[#16213E] border-[var(--neon-purple)]/30 text-white"
+              />
+              <Input
+                placeholder="Требования"
+                value={newJobRequirements}
+                onChange={(e) => setNewJobRequirements(e.target.value)}
+                className="bg-[#16213E] border-[var(--neon-purple)]/30 text-white"
+              />
+              <Button
+                onClick={handleAddJob}
+                className="w-full bg-[var(--neon-purple)] hover:bg-[var(--neon-purple)]/80 text-white"
+              >
+                <Icon name="Plus" className="mr-2" size={18} />
+                Добавить вакансию
+              </Button>
+            </div>
+
+            <Button
+              onClick={handleSaveJobs}
+              className="w-full bg-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/80 text-black neon-glow-cyan"
+            >
+              <Icon name="Save" className="mr-2" size={20} />
+              Сохранить изменения
+            </Button>
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-[var(--neon-cyan)]/30">
             <Label className="text-white text-xl neon-text-pink">
               Заявки на вакансии ({applications.length})
             </Label>

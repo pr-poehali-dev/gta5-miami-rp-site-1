@@ -15,6 +15,13 @@ interface JobApplication {
   date: string;
 }
 
+interface Job {
+  id: number;
+  title: string;
+  requirements: string;
+  status: "Открыта" | "Закрыта";
+}
+
 const Index = () => {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState("home");
@@ -24,6 +31,7 @@ const Index = () => {
   const [vkInput, setVkInput] = useState("");
   const [ageInput, setAgeInput] = useState("");
   const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [screenshots, setScreenshots] = useState([
     "https://via.placeholder.com/400x300/FF006E/FFFFFF?text=Miami+RP+1",
     "https://via.placeholder.com/400x300/00F0FF/000000?text=Miami+RP+2",
@@ -36,11 +44,7 @@ const Index = () => {
     { id: 3, title: "Предложение по улучшению", author: "ProGamer", replies: 23, category: "Предложения" },
   ];
 
-  const jobs = [
-    { title: "Модератор", requirements: "Опыт на серверах GTA RP, возраст 18+", status: "Открыта" },
-    { title: "Хелпер", requirements: "Активность 4+ часа в день", status: "Открыта" },
-    { title: "Администратор", requirements: "Опыт администрирования", status: "Закрыта" },
-  ];
+
 
   const handleAddImage = (url: string) => {
     setScreenshots([...screenshots, url]);
@@ -64,6 +68,10 @@ const Index = () => {
         description: `Ваша заявка на должность "${jobTitle}" успешно отправлена администрации.`,
       });
     }
+  };
+
+  const handleUpdateJobs = (updatedJobs: Job[]) => {
+    setJobs(updatedJobs);
   };
 
   return (
@@ -369,6 +377,8 @@ const Index = () => {
         <AdminPanel
           onAddImage={handleAddImage}
           applications={applications}
+          jobs={jobs}
+          onUpdateJobs={handleUpdateJobs}
           onClose={() => setShowAdminPanel(false)}
         />
       )}
