@@ -43,14 +43,18 @@
       const settings = {};
       data.forEach(s => settings[s.key] = s.value);
       
-      // Initialize VK with settings
-      if (settings.vk_app_id && settings.vk_app_id !== 'YOUR_APP_ID') {
-        VK.init({apiId: parseInt(settings.vk_app_id)});
+      // Initialize VK with settings - check if real IDs are configured
+      const appId = settings['vk_app_id'];
+      const groupId = settings['vk_group_id'];
+      const buttonText = settings['vk_button_text'] || 'Есть вопрос?';
+      
+      if (appId && appId !== 'YOUR_APP_ID' && !isNaN(parseInt(appId))) {
+        VK.init({apiId: parseInt(appId)});
         
-        if (settings.vk_group_id && settings.vk_group_id !== 'YOUR_GROUP_ID') {
-          VK.Widgets.CommunityMessages("vk_community_messages", parseInt(settings.vk_group_id), {
+        if (groupId && groupId !== 'YOUR_GROUP_ID' && !isNaN(parseInt(groupId))) {
+          VK.Widgets.CommunityMessages("vk_community_messages", parseInt(groupId), {
             expanded: "0",
-            tooltipButtonText: settings.vk_button_text || "Есть вопрос?"
+            tooltipButtonText: buttonText
           });
         }
       }
