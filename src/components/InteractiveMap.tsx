@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 interface MapMarker {
   id: number;
@@ -18,6 +19,9 @@ const InteractiveMap = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [showMarkers, setShowMarkers] = useState(true);
+  const [mapMode, setMapMode] = useState<"satellite" | "scheme">("satellite");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const markers: MapMarker[] = [
@@ -42,7 +46,23 @@ const InteractiveMap = () => {
   const handleReset = () => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
+    setSelectedMarker(null);
   };
+
+  const handleSearch = (marker: MapMarker) => {
+    setSelectedMarker(marker.id);
+    setScale(2);
+    const containerWidth = containerRef.current?.clientWidth || 0;
+    const containerHeight = containerRef.current?.clientHeight || 0;
+    setPosition({
+      x: containerWidth / 2 - (marker.x * containerWidth / 100) * 2,
+      y: containerHeight / 2 - (marker.y * containerHeight / 100) * 2,
+    });
+  };
+
+  const filteredMarkers = markers.filter((marker) =>
+    marker.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -115,7 +135,7 @@ const InteractiveMap = () => {
           }}
         >
           <img
-            src="/img/170388c5-ac72-4cb2-bdff-ff4a9f49babc.jpg"
+            src={mapMode === "satellite" ? "/img/170388c5-ac72-4cb2-bdff-ff4a9f49babc.jpg" : "/img/6ab409ec-9e96-4c14-9b64-8e21c10e2ee9.jpg"}
             alt="GTA 5 Map"
             className="w-full h-full object-contain pointer-events-none select-none"
             draggable={false}
@@ -130,9 +150,12 @@ const InteractiveMap = () => {
                 top: `${marker.y}%`,
                 transform: 'translate(-50%, -50%)',
               }}
+              onClick={() => handleSearch(marker)}
             >
               <div
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center animate-pulse shadow-lg"
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                  selectedMarker === marker.id ? 'animate-bounce scale-125' : 'animate-pulse'
+                }`}
                 style={{
                   backgroundColor: marker.color,
                   boxShadow: `0 0 20px ${marker.color}, 0 0 40px ${marker.color}`,
@@ -155,9 +178,35 @@ const InteractiveMap = () => {
           ))}
         </div>
 
-        <div className="absolute top-4 left-4 bg-[#16213E]/90 backdrop-blur-sm rounded-lg p-3 border border-[var(--neon-pink)]/30 pointer-events-none z-10">
-          <h3 className="neon-text-pink font-bold text-base sm:text-lg mb-1">Miami RP Map</h3>
-          <p className="text-white/60 text-xs sm:text-sm">Перемещайте и масштабируйте</p>
+        <div className="absolute top-4 left-4 bg-[#16213E]/90 backdrop-blur-sm rounded-lg p-3 border border-[var(--neon-pink)]/30 z-10 max-w-md">
+          <h3 className="neon-text-pink font-bold text-base sm:text-lg mb-2">Miami RP Map</h3>
+          <div className="relative pointer-events-auto">
+            <Icon name="Search" size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-white/60" />
+            <Input
+              type="text"
+              placeholder="Поиск локации..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 bg-[#0F172A]/80 border-[var(--neon-cyan)]/30 text-white placeholder:text-white/40 text-sm h-8"
+            />
+            {searchQuery && filteredMarkers.length > 0 && (
+              <div className="absolute top-full mt-1 w-full bg-[#0F172A]/95 border border-[var(--neon-cyan)]/30 rounded-lg overflow-hidden max-h-40 overflow-y-auto">
+                {filteredMarkers.map((marker) => (
+                  <div
+                    key={marker.id}
+                    onClick={() => {
+                      handleSearch(marker);
+                      setSearchQuery("");
+                    }}
+                    className="px-3 py-2 hover:bg-[var(--neon-cyan)]/20 cursor-pointer text-white text-sm flex items-center gap-2"
+                  >
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: marker.color }}></div>
+                    {marker.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -189,6 +238,13 @@ const InteractiveMap = () => {
           title="Метки"
         >
           <Icon name="MapPin" size={20} />
+        </Button>
+        <Button
+          onClick={() => setMapMode(mapMode === "satellite" ? "scheme" : "satellite")}
+          className="bg-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/80 neon-glow-cyan text-black w-10 h-10 sm:w-12 sm:h-12 p-0"
+          title={mapMode === "satellite" ? "Схема" : "Спутник"}
+        >
+          <Icon name={mapMode === "satellite" ? "Map" : "Satellite"} size={20} />
         </Button>
       </div>
 
