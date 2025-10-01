@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import AdminPanel from "@/components/AdminPanel";
-import InteractiveMap from "@/components/InteractiveMap";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -40,7 +39,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <h1 className="text-2xl sm:text-4xl font-bold neon-text-pink">MIAMI RP</h1>
             <div className="flex gap-1 sm:gap-4 flex-wrap justify-center">
-              {["home", "rules", "jobs", "stats", "map", "gallery", "forum"].map((section) => (
+              {["home", "rules", "jobs", "stats", "gallery", "forum"].map((section) => (
                 <Button
                   key={section}
                   onClick={() => setActiveSection(section)}
@@ -55,7 +54,6 @@ const Index = () => {
                     {section === "rules" && "Правила"}
                     {section === "jobs" && "Вакансии"}
                     {section === "stats" && "Статистика"}
-                    {section === "map" && "Карта"}
                     {section === "gallery" && "Галерея"}
                     {section === "forum" && "Форум"}
                   </span>
@@ -221,19 +219,6 @@ const Index = () => {
                 </CardContent>
               </Card>
             </div>
-          </div>
-        )}
-
-        {activeSection === "map" && (
-          <div className="space-y-6 sm:space-y-8">
-            <h2 className="text-3xl sm:text-5xl font-bold neon-text-pink mb-6 sm:mb-8">Интерактивная карта сервера</h2>
-            <Card className="bg-[#16213E] border-[var(--neon-pink)]/30">
-              <CardContent className="p-0">
-                <div className="h-[400px] sm:h-[600px]">
-                  <InteractiveMap />
-                </div>
-              </CardContent>
-            </Card>
           </div>
         )}
 
