@@ -6,10 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import AdminPanel from "@/components/AdminPanel";
 
+interface JobApplication {
+  id: number;
+  jobTitle: string;
+  vk: string;
+  age: string;
+  date: string;
+}
+
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [onlinePlayers] = useState(247);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showApplicationForm, setShowApplicationForm] = useState<string | null>(null);
+  const [vkInput, setVkInput] = useState("");
+  const [ageInput, setAgeInput] = useState("");
+  const [applications, setApplications] = useState<JobApplication[]>([]);
   const [screenshots, setScreenshots] = useState([
     "https://via.placeholder.com/400x300/FF006E/FFFFFF?text=Miami+RP+1",
     "https://via.placeholder.com/400x300/00F0FF/000000?text=Miami+RP+2",
@@ -30,6 +42,22 @@ const Index = () => {
 
   const handleAddImage = (url: string) => {
     setScreenshots([...screenshots, url]);
+  };
+
+  const handleSubmitApplication = (jobTitle: string) => {
+    if (vkInput.trim() && ageInput.trim()) {
+      const newApplication: JobApplication = {
+        id: Date.now(),
+        jobTitle,
+        vk: vkInput,
+        age: ageInput,
+        date: new Date().toLocaleString('ru-RU'),
+      };
+      setApplications([...applications, newApplication]);
+      setVkInput("");
+      setAgeInput("");
+      setShowApplicationForm(null);
+    }
   };
 
   return (
@@ -185,9 +213,49 @@ const Index = () => {
                   </CardHeader>
                   <CardContent>
                     {job.status === "Открыта" && (
-                      <Button className="bg-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/80 text-black">
-                        Подать заявку
-                      </Button>
+                      <div className="space-y-4">
+                        {showApplicationForm === job.title ? (
+                          <div className="space-y-3">
+                            <input
+                              type="text"
+                              placeholder="Ваш ВК (например: vk.com/id123)"
+                              value={vkInput}
+                              onChange={(e) => setVkInput(e.target.value)}
+                              className="w-full px-4 py-2 bg-[#1A1A2E] border border-[var(--neon-cyan)]/30 rounded text-white placeholder:text-white/50"
+                            />
+                            <input
+                              type="number"
+                              placeholder="Ваш возраст"
+                              value={ageInput}
+                              onChange={(e) => setAgeInput(e.target.value)}
+                              className="w-full px-4 py-2 bg-[#1A1A2E] border border-[var(--neon-cyan)]/30 rounded text-white placeholder:text-white/50"
+                            />
+                            <div className="flex gap-2">
+                              <Button 
+                                onClick={() => handleSubmitApplication(job.title)}
+                                className="bg-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/80 text-black flex-1"
+                              >
+                                <Icon name="Send" className="mr-2" size={18} />
+                                Отправить
+                              </Button>
+                              <Button 
+                                onClick={() => setShowApplicationForm(null)}
+                                variant="outline"
+                                className="border-[var(--neon-pink)]/50 text-white"
+                              >
+                                Отмена
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <Button 
+                            onClick={() => setShowApplicationForm(job.title)}
+                            className="bg-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/80 text-black"
+                          >
+                            Подать заявку
+                          </Button>
+                        )}
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -294,6 +362,7 @@ const Index = () => {
       {showAdminPanel && (
         <AdminPanel
           onAddImage={handleAddImage}
+          applications={applications}
           onClose={() => setShowAdminPanel(false)}
         />
       )}

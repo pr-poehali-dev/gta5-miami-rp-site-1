@@ -6,8 +6,17 @@ import { Label } from "@/components/ui/label";
 import Icon from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
 
+interface JobApplication {
+  id: number;
+  jobTitle: string;
+  vk: string;
+  age: string;
+  date: string;
+}
+
 interface AdminPanelProps {
   onAddImage: (url: string) => void;
+  applications: JobApplication[];
   onClose: () => void;
 }
 
@@ -91,10 +100,10 @@ const AdminPanel = ({ onAddImage, onClose }: AdminPanelProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <Card className="bg-[#16213E] border-[var(--neon-cyan)]/50 w-full max-w-2xl my-8">
+      <Card className="bg-[#16213E] border-[var(--neon-cyan)]/50 w-full max-w-4xl my-8">
         <CardHeader>
           <CardTitle className="neon-text-cyan text-2xl flex items-center justify-between">
-            <span>Управление галереей</span>
+            <span>Админ-панель</span>
             <Button
               variant="ghost"
               size="sm"
@@ -107,8 +116,42 @@ const AdminPanel = ({ onAddImage, onClose }: AdminPanelProps) => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
-            <Label htmlFor="imageUrl" className="text-white text-lg">
-              Добавить изображение
+            <Label className="text-white text-xl neon-text-pink">
+              Заявки на вакансии ({applications.length})
+            </Label>
+            {applications.length === 0 ? (
+              <p className="text-white/60 text-center py-8">Пока нет заявок</p>
+            ) : (
+              <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                {applications.map((app) => (
+                  <Card key={app.id} className="bg-[#1A1A2E] border-[var(--neon-pink)]/30">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col sm:flex-row justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-white font-bold">{app.jobTitle}</p>
+                          <div className="flex gap-4 text-sm text-white/70">
+                            <span className="flex items-center gap-1">
+                              <Icon name="User" size={14} />
+                              ВК: {app.vk}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Icon name="Calendar" size={14} />
+                              {app.age} лет
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-xs text-white/50">{app.date}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-[var(--neon-cyan)]/30">
+            <Label htmlFor="imageUrl" className="text-white text-xl neon-text-cyan">
+              Управление галереей
             </Label>
             <div className="flex gap-3">
               <Input
