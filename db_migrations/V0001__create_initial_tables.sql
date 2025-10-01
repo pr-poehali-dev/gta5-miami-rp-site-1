@@ -1,0 +1,21 @@
+CREATE TABLE jobs (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    requirements TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Открыта',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE job_applications (
+    id SERIAL PRIMARY KEY,
+    job_title VARCHAR(255) NOT NULL,
+    vk VARCHAR(255) NOT NULL,
+    age VARCHAR(10) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE screenshots (
+    id SERIAL PRIMARY KEY,
+    url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

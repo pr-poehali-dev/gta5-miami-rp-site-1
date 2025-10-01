@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,8 @@ interface Job {
   status: "Открыта" | "Закрыта";
 }
 
+const API_URL = "https://functions.poehali.dev/8041e2d0-0a4d-4f86-a776-4ba0c1ad8ee0";
+
 const Index = () => {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState("home");
@@ -32,11 +34,50 @@ const Index = () => {
   const [ageInput, setAgeInput] = useState("");
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [screenshots, setScreenshots] = useState([
-    "https://via.placeholder.com/400x300/FF006E/FFFFFF?text=Miami+RP+1",
-    "https://via.placeholder.com/400x300/00F0FF/000000?text=Miami+RP+2",
-    "https://via.placeholder.com/400x300/8B00FF/FFFFFF?text=Miami+RP+3",
-  ]);
+  const [screenshots, setScreenshots] = useState<string[]>([]);
+
+  useEffect(() => {
+    loadJobs();
+    loadApplications();
+    loadScreenshots();
+  }, []);
+
+  const loadJobs = async () => {
+    try {
+      const response = await fetch(`${API_URL}?resource=jobs`);
+      const data = await response.json();
+      setJobs(data);
+    } catch (error) {
+      console.error('Error loading jobs:', error);
+    }
+  };
+
+  const loadApplications = async () => {
+    try {
+      const response = await fetch(`${API_URL}?resource=applications`);
+      const data = await response.json();
+      const formatted = data.map((app: any) => ({
+        id: app.id,
+        jobTitle: app.job_title,
+        vk: app.vk,
+        age: app.age,
+        date: new Date(app.created_at).toLocaleString('ru-RU')
+      }));
+      setApplications(formatted);
+    } catch (error) {
+      console.error('Error loading applications:', error);
+    }
+  };
+
+  const loadScreenshots = async () => {
+    try {
+      const response = await fetch(`${API_URL}?resource=screenshots`);
+      const data = await response.json();
+      setScreenshots(data.map((s: any) => s.url));
+    } catch (error) {
+      console.error('Error loading screenshots:', error);
+    }
+  };
 
   const forumTopics = [
     { id: 1, title: "Правила сервера обновлены", author: "Admin", replies: 15, category: "Объявления" },
@@ -46,32 +87,57 @@ const Index = () => {
 
 
 
-  const handleAddImage = (url: string) => {
-    setScreenshots([...screenshots, url]);
-  };
-
-  const handleSubmitApplication = (jobTitle: string) => {
-    if (vkInput.trim() && ageInput.trim()) {
-      const newApplication: JobApplication = {
-        id: Date.now(),
-        jobTitle,
-        vk: vkInput,
-        age: ageInput,
-        date: new Date().toLocaleString('ru-RU'),
-      };
-      setApplications([...applications, newApplication]);
-      setVkInput("");
-      setAgeInput("");
-      setShowApplicationForm(null);
-      toast({
-        title: "Заявка отправлена!",
-        description: `Ваша заявка на должность "${jobTitle}" успешно отправлена администрации.`,
+  const handleAddImage = async (url: string) => {
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resource: 'screenshots', url })
       });
+      await loadScreenshots();
+    } catch (error) {
+      console.error('Error adding image:', error);
     }
   };
 
-  const handleUpdateJobs = (updatedJobs: Job[]) => {
-    setJobs(updatedJobs);
+  const handleSubmitApplication = async (jobTitle: string) => {
+    if (vkInput.trim() && ageInput.trim()) {
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resource: 'applications', jobTitle, vk: vkInput, age: ageInput })
+        });
+        await loadApplications();
+        setVkInput("");
+        setAgeInput("");
+        setShowApplicationForm(null);
+        toast({
+          title: "Заявка отправлена!",
+          description: `Ваша заявка на должность "${jobTitle}" успешно отправлена администрации.`,
+        });
+      } catch (error) {
+        console.error('Error submitting application:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось отправить заявку",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleUpdateJobs = async (updatedJobs: Job[]) => {
+    try {
+      await fetch(API_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resource: 'jobs', jobs: updatedJobs })
+      });
+      await loadJobs();
+    } catch (error) {
+      console.error('Error updating jobs:', error);
+    }
   };
 
   return (

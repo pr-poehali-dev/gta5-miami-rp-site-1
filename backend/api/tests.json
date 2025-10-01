@@ -1,0 +1,18 @@
+{
+  "tests": [
+    {
+      "name": "Get jobs list",
+      "method": "GET",
+      "path": "/?resource=jobs",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get applications list",
+      "method": "GET",
+      "path": "/?resource=applications",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

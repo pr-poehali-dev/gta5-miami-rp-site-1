@@ -22,6 +22,12 @@
     <script src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
     <script src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js"></script>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
+    
+    <!-- VK OpenAPI -->
+    <script src="https://vk.com/js/api/openapi.js?169" type="text/javascript"></script>
+    <script type="text/javascript">
+      VK.init({apiId: YOUR_APP_ID});
+    </script>
 
     <meta name="pp-name" value="gta5-miami-rp-site-1">
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
@@ -29,6 +35,16 @@
 
 <body>
 <div id="root"></div>
+
+<!-- VK Widget -->
+<div id="vk_community_messages"></div>
+<script type="text/javascript">
+  VK.Widgets.CommunityMessages("vk_community_messages", YOUR_GROUP_ID, {
+    expanded: "0",
+    tooltipButtonText: "Есть вопрос?"
+  });
+</script>
+
 <script type="module" src="/src/main.tsx"></script>
 
 <!-- Yandex.Metrika counter -->
