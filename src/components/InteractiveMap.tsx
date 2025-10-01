@@ -93,13 +93,13 @@ const InteractiveMap = () => {
           }}
         >
           <img
-            src="https://i.imgur.com/9kOIYWO.jpg"
+            src="https://images2.imgbox.com/75/97/Qh3cnxE0_o.jpg"
             alt="GTA 5 Map"
             className="w-full h-full object-contain pointer-events-none select-none"
             draggable={false}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = "https://via.placeholder.com/800x800/1A1A2E/FF006E?text=GTA+5+Map+Loading";
+              target.src = "https://static.wikia.nocookie.net/gtawiki/images/f/fb/LSSatelliteView-GTAV.jpg";
             }}
           />
         </div>
