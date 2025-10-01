@@ -115,13 +115,13 @@ const InteractiveMap = () => {
           }}
         >
           <img
-            src="https://images2.imgbox.com/75/97/Qh3cnxE0_o.jpg"
+            src="https://i.imgur.com/U8e4zKT.jpeg"
             alt="GTA 5 Map"
             className="w-full h-full object-contain pointer-events-none select-none"
             draggable={false}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = "https://static.wikia.nocookie.net/gtawiki/images/f/fb/LSSatelliteView-GTAV.jpg";
+              target.src = "https://i.redd.it/hoy1tf298zpb1.png";
             }}
           />
           
