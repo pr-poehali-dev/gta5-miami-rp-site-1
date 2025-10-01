@@ -4,10 +4,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import AdminPanel from "@/components/AdminPanel";
+import InteractiveMap from "@/components/InteractiveMap";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [onlinePlayers] = useState(247);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [screenshots, setScreenshots] = useState([
+    "https://via.placeholder.com/400x300/FF006E/FFFFFF?text=Miami+RP+1",
+    "https://via.placeholder.com/400x300/00F0FF/000000?text=Miami+RP+2",
+    "https://via.placeholder.com/400x300/8B00FF/FFFFFF?text=Miami+RP+3",
+  ]);
 
   const forumTopics = [
     { id: 1, title: "Правила сервера обновлены", author: "Admin", replies: 15, category: "Объявления" },
@@ -21,11 +29,9 @@ const Index = () => {
     { title: "Администратор", requirements: "Опыт администрирования", status: "Закрыта" },
   ];
 
-  const screenshots = [
-    "https://via.placeholder.com/400x300/FF006E/FFFFFF?text=Miami+RP+1",
-    "https://via.placeholder.com/400x300/00F0FF/000000?text=Miami+RP+2",
-    "https://via.placeholder.com/400x300/8B00FF/FFFFFF?text=Miami+RP+3",
-  ];
+  const handleAddImage = (url: string) => {
+    setScreenshots([...screenshots, url]);
+  };
 
   return (
     <div className="min-h-screen bg-[#1A1A2E]">
@@ -223,8 +229,8 @@ const Index = () => {
             <h2 className="text-3xl sm:text-5xl font-bold neon-text-pink mb-6 sm:mb-8">Интерактивная карта сервера</h2>
             <Card className="bg-[#16213E] border-[var(--neon-pink)]/30">
               <CardContent className="p-0">
-                <div className="h-[400px] sm:h-[600px] bg-gradient-to-br from-[var(--neon-pink)]/20 via-[var(--neon-purple)]/20 to-[var(--neon-cyan)]/20 flex items-center justify-center">
-                  <p className="text-lg sm:text-2xl neon-text-cyan">Карта загружается...</p>
+                <div className="h-[400px] sm:h-[600px]">
+                  <InteractiveMap />
                 </div>
               </CardContent>
             </Card>
@@ -233,7 +239,16 @@ const Index = () => {
 
         {activeSection === "gallery" && (
           <div className="space-y-6 sm:space-y-8">
-            <h2 className="text-3xl sm:text-5xl font-bold neon-text-cyan mb-6 sm:mb-8">Галерея скриншотов</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h2 className="text-3xl sm:text-5xl font-bold neon-text-cyan">Галерея скриншотов</h2>
+              <Button
+                onClick={() => setShowAdminPanel(true)}
+                className="bg-[var(--neon-purple)] hover:bg-[var(--neon-purple)]/80 text-white"
+              >
+                <Icon name="Settings" className="mr-2" size={20} />
+                Управление
+              </Button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {screenshots.map((src, idx) => (
                 <Card key={idx} className="bg-[#16213E] border-[var(--neon-pink)]/30 hover:neon-border-pink transition-all overflow-hidden">
@@ -290,6 +305,13 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {showAdminPanel && (
+        <AdminPanel
+          onAddImage={handleAddImage}
+          onClose={() => setShowAdminPanel(false)}
+        />
+      )}
     </div>
   );
 };
