@@ -115,7 +115,7 @@ const InteractiveMap = () => {
           }}
         >
           <img
-            src="/img/c4777b79-00a0-4a8e-8500-e2acf02a3cdc.jpg"
+            src="/img/170388c5-ac72-4cb2-bdff-ff4a9f49babc.jpg"
             alt="GTA 5 Map"
             className="w-full h-full object-contain pointer-events-none select-none"
             draggable={false}
