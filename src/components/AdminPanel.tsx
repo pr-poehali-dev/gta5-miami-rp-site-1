@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,12 @@ interface Job {
   status: "Открыта" | "Закрыта";
 }
 
+interface VKSettings {
+  vk_app_id: string;
+  vk_group_id: string;
+  vk_button_text: string;
+}
+
 interface AdminPanelProps {
   onAddImage: (url: string) => void;
   applications: JobApplication[];
@@ -29,6 +35,8 @@ interface AdminPanelProps {
   onClose: () => void;
 }
 
+const API_URL = "https://functions.poehali.dev/8041e2d0-0a4d-4f86-a776-4ba0c1ad8ee0";
+
 const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: AdminPanelProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -36,7 +44,32 @@ const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: A
   const [editableJobs, setEditableJobs] = useState<Job[]>(jobs);
   const [newJobTitle, setNewJobTitle] = useState("");
   const [newJobRequirements, setNewJobRequirements] = useState("");
+  const [vkSettings, setVkSettings] = useState<VKSettings>({
+    vk_app_id: "YOUR_APP_ID",
+    vk_group_id: "YOUR_GROUP_ID",
+    vk_button_text: "Есть вопрос?"
+  });
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSettings();
+    }
+  }, [isAuthenticated]);
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch(`${API_URL}?resource=settings`);
+      const data = await response.json();
+      const settings: any = {};
+      data.forEach((s: any) => {
+        settings[s.key] = s.value;
+      });
+      setVkSettings(settings as VKSettings);
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
 
   const ADMIN_PASSWORD = "miami2024";
 
@@ -109,6 +142,27 @@ const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: A
       title: "Сохранено",
       description: "Вакансии успешно обновлены",
     });
+  };
+
+  const handleSaveVKSettings = async () => {
+    try {
+      await fetch(API_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resource: 'settings', settings: vkSettings })
+      });
+      toast({
+        title: "Сохранено",
+        description: "Настройки ВК успешно обновлены. Перезагрузите страницу.",
+      });
+    } catch (error) {
+      console.error('Error saving VK settings:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сохранить настройки",
+        variant: "destructive"
+      });
+    }
   };
 
   if (!isAuthenticated) {
@@ -272,6 +326,51 @@ const AdminPanel = ({ onAddImage, applications, jobs, onUpdateJobs, onClose }: A
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-[var(--neon-cyan)]/30">
+            <Label className="text-white text-xl neon-text-cyan">
+              Настройки виджета ВКонтакте
+            </Label>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="vkAppId" className="text-white/80 text-sm">ID приложения ВК</Label>
+                <Input
+                  id="vkAppId"
+                  value={vkSettings.vk_app_id}
+                  onChange={(e) => setVkSettings({...vkSettings, vk_app_id: e.target.value})}
+                  className="bg-[#1A1A2E] border-[var(--neon-cyan)]/30 text-white"
+                  placeholder="51234567"
+                />
+              </div>
+              <div>
+                <Label htmlFor="vkGroupId" className="text-white/80 text-sm">ID группы ВК</Label>
+                <Input
+                  id="vkGroupId"
+                  value={vkSettings.vk_group_id}
+                  onChange={(e) => setVkSettings({...vkSettings, vk_group_id: e.target.value})}
+                  className="bg-[#1A1A2E] border-[var(--neon-cyan)]/30 text-white"
+                  placeholder="198765432"
+                />
+              </div>
+              <div>
+                <Label htmlFor="vkButtonText" className="text-white/80 text-sm">Текст на кнопке</Label>
+                <Input
+                  id="vkButtonText"
+                  value={vkSettings.vk_button_text}
+                  onChange={(e) => setVkSettings({...vkSettings, vk_button_text: e.target.value})}
+                  className="bg-[#1A1A2E] border-[var(--neon-cyan)]/30 text-white"
+                  placeholder="Есть вопрос?"
+                />
+              </div>
+              <Button
+                onClick={handleSaveVKSettings}
+                className="w-full bg-[var(--neon-cyan)] hover:bg-[var(--neon-cyan)]/80 text-black"
+              >
+                <Icon name="Save" className="mr-2" size={18} />
+                Сохранить настройки ВК
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-4 pt-4 border-t border-[var(--neon-cyan)]/30">

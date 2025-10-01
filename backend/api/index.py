@@ -61,6 +61,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps(screenshots, default=str)
                 }
+            
+            if resource == 'settings':
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    cur.execute("SELECT key, value FROM settings")
+                    settings = cur.fetchall()
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps(settings, default=str)
+                }
         
         if method == 'POST':
             body_data = json.loads(event.get('body', '{}'))
@@ -126,6 +136,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({'message': 'Jobs updated'})
+                }
+            
+            if resource == 'settings':
+                settings = body_data.get('settings', {})
+                with conn.cursor() as cur:
+                    for key, value in settings.items():
+                        cur.execute(
+                            "UPDATE settings SET value = %s, updated_at = CURRENT_TIMESTAMP WHERE key = %s",
+                            (value, key)
+                        )
+                    conn.commit()
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'message': 'Settings updated'})
                 }
         
         if method == 'DELETE':

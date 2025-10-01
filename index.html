@@ -25,9 +25,6 @@
     
     <!-- VK OpenAPI -->
     <script src="https://vk.com/js/api/openapi.js?169" type="text/javascript"></script>
-    <script type="text/javascript">
-      VK.init({apiId: YOUR_APP_ID});
-    </script>
 
     <meta name="pp-name" value="gta5-miami-rp-site-1">
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
@@ -39,10 +36,26 @@
 <!-- VK Widget -->
 <div id="vk_community_messages"></div>
 <script type="text/javascript">
-  VK.Widgets.CommunityMessages("vk_community_messages", YOUR_GROUP_ID, {
-    expanded: "0",
-    tooltipButtonText: "Есть вопрос?"
-  });
+  // Load VK settings from database
+  fetch('https://functions.poehali.dev/8041e2d0-0a4d-4f86-a776-4ba0c1ad8ee0?resource=settings')
+    .then(res => res.json())
+    .then(data => {
+      const settings = {};
+      data.forEach(s => settings[s.key] = s.value);
+      
+      // Initialize VK with settings
+      if (settings.vk_app_id && settings.vk_app_id !== 'YOUR_APP_ID') {
+        VK.init({apiId: parseInt(settings.vk_app_id)});
+        
+        if (settings.vk_group_id && settings.vk_group_id !== 'YOUR_GROUP_ID') {
+          VK.Widgets.CommunityMessages("vk_community_messages", parseInt(settings.vk_group_id), {
+            expanded: "0",
+            tooltipButtonText: settings.vk_button_text || "Есть вопрос?"
+          });
+        }
+      }
+    })
+    .catch(err => console.error('VK settings load error:', err));
 </script>
 
 <script type="module" src="/src/main.tsx"></script>
