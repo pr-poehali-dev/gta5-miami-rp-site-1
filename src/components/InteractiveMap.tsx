@@ -115,14 +115,10 @@ const InteractiveMap = () => {
           }}
         >
           <img
-            src="https://static.wikia.nocookie.net/gtawiki/images/f/fb/LSSatelliteView-GTAV.jpg/revision/latest?cb=20150422155543"
+            src="/img/c4777b79-00a0-4a8e-8500-e2acf02a3cdc.jpg"
             alt="GTA 5 Map"
             className="w-full h-full object-contain pointer-events-none select-none"
             draggable={false}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "https://oyster.ignimgs.com/mediawiki/apis.ign.com/grand-theft-auto-5/5/52/Gtavmap.jpg";
-            }}
           />
           
           {showMarkers && markers.map((marker) => (
